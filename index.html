@@ -125,22 +125,22 @@
 
     const RegisterForm = {
         template: `
-            <h2>Registro de Nuevo Usuario</h2>
-            <div v-if="error" class="error">{{ error }}</div>
-            <div v-if="success" class="success">{{ success }}</div>
-            <form @submit.prevent="registerUser">
-                <input type="text" v-model="name" placeholder="Nombre completo" required>
-                <input type="email" v-model="email" placeholder="Correo Electrónico" required>
-                <input type="password" v-model="password" placeholder="Contraseña (min. 6 caracteres)" required>
-                <input type="text" v-model="phone_number" placeholder="Teléfono" required>
+          <h2>Registro de Nuevo Usuario</h2>
+          <div v-if="error" class="error">{{ error }}</div>
+          <div v-if="success" class="success">{{ success }}</div>
+          <form @submit.prevent="registerUser">
+            <input type="text" v-model="name" placeholder="Nombre completo" required>
+            <input type="email" v-model="email" placeholder="Correo Electrónico" required>
+            <input type="password" v-model="password" placeholder="Contraseña (min. 6 caracteres)" required>
+            <input type="text" v-model="phone_number" placeholder="Teléfono" required>
 
-                <button type="submit" :disabled="loading">
-                    {{ loading ? 'Registrando...' : 'Confirmar Registro' }}
-                </button>
-                <button type="button" class="secondary" @click="$emit('go-login')" :disabled="loading">
-                    Volver al Login
-                </button>
-            </form>
+            <button type="submit" :disabled="loading">
+              {{ loading ? 'Registrando...' : 'Confirmar Registro' }}
+            </button>
+            <button type="button" class="secondary" @click="$emit('go-login')" :disabled="loading">
+              Volver al Login
+            </button>
+          </form>
         `,
         setup(props, { emit }) {
             const name = ref('');
@@ -190,29 +190,34 @@
     const CreateOrderForm = {
         props: ['onOrderCreated'],
         template: `
-          <h3>Crear Nueva Orden</h3>
-          <div v-if="error" class="error">{{ error }}</div>
-          <div v-if="success" class="success">{{ success }}</div>
-          <form @submit.prevent="createOrder">
-            <div class="form-group">
-              <label>Nombre Cliente:</label>
-              <input type="text" v-model="customer_first_name" required>
-            </div>
-            <div class="form-group">
-              <label>Email Cliente:</label>
-              <input type="email" v-model="customer_email" required>
-            </div>
+            <h3>Crear Nueva Orden</h3>
+            <div v-if="error" class="error">{{ error }}</div>
+            <div v-if="success" class="success">{{ success }}</div>
+            <form @submit.prevent="createOrder">
+                <div class="form-group">
+                    <label>Nombre Cliente:</label>
+                    <input type="text" v-model="customer_first_name" required>
+                </div>
+                <div class="form-group">
+                    <label>Apellido Cliente:</label>
+                    <input type="text" v-model="customer_last_name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Cliente:</label>
+                    <input type="email" v-model="customer_email" required>
+                </div>
 
-            <p>Ítem Fijo (Mouse Gamer, Cantidad: 1, Precio: 45.00)</p>
+                <p>Ítem Fijo (Monitor Gamer, Cantidad: 2, Precio: 100.00)</p>
 
-            <button type="submit" :disabled="loading">
-              {{ loading ? 'Creando...' : 'Crear Orden' }}
-            </button>
-          </form>
+                <button type="submit" :disabled="loading">
+                    {{ loading ? 'Creando...' : 'Crear Orden' }}
+                </button>
+            </form>
         `,
         setup(props) {
-            const customer_first_name = ref('Juan');
-            const customer_email = ref('juan.perez@test.com');
+            const customer_first_name = ref('');
+            const customer_last_name = ref('');
+            const customer_email = ref('');
             const loading = ref(false);
             const error = ref(null);
             const success = ref(null);
@@ -224,14 +229,14 @@
 
                 const payload = {
                     customer_first_name: customer_first_name.value,
-                    customer_last_name: 'Perez',
+                    customer_last_name: customer_last_name.value,
                     customer_email: customer_email.value,
                     payment_method: 'credit_card',
                     items: [
                         {
-                            product_name: 'Mouse Gamer',
-                            quantity: 1,
-                            unit_price: 45.00
+                            product_name: 'Monitor Gamer',
+                            quantity: 2,
+                            unit_price: 100.00
                         }
                     ]
                 };
@@ -239,6 +244,10 @@
                 try {
                     const response = await api.post('/list/orders', payload);
                     success.value = `Orden #${response.data.data.id} creada exitosamente! Total: $${response.data.data.total_amount}`;
+
+                    customer_first_name.value = '';
+                    customer_last_name.value = '';
+                    customer_email.value = '';
 
                     props.onOrderCreated();
 
@@ -254,7 +263,7 @@
                 }
             };
 
-            return { customer_first_name, customer_email, loading, error, success, createOrder };
+            return { customer_first_name, customer_last_name, customer_email, loading, error, success, createOrder };
         }
     };
 
